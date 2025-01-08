@@ -93,6 +93,42 @@ class StudentManagementApp:
     #     Button(self.content_frame, text="Modifier", command=self.modify_student).grid(row=4, column=6, padx=5,pady=5)
     #     Button(self.content_frame, text="Supprimer", command=self.delete_student).grid(row=4, column=7, padx=5,pady=5)
     #     Button(self.content_frame, text="Importer", command=self.delete_student).grid(row=4, column=8, padx=5,pady=5)
+    def delete_student(self):
+    """Delete a student after confirmation."""
+    selected_item = self.treeview_students.selection()
+
+    if not selected_item:
+        messagebox.showwarning("No Student Selected", "Please select a student to delete.")
+        return
+
+    # Get the student ID from the selected item in the Treeview
+    student_id = self.treeview_students.item(selected_item[0], "values")[0]
+
+    # Query the database to find the student
+    student_to_delete = session.query(Student).filter_by(id=student_id).first()
+
+    if not student_to_delete:
+        messagebox.showerror("Error", "The selected student does not exist.")
+        return
+
+    # Ask for confirmation
+    confirm = messagebox.askyesno(
+        "Delete Confirmation",
+        f"Are you sure you want to delete the student '{student_to_delete.name}'?"
+    )
+
+    if confirm:
+        try:
+            # Delete the student from the database
+            student_to_delete.delete()
+
+            # Refresh the student list in the UI
+            self.refresh_students()
+
+            messagebox.showinfo("Success", "Student deleted successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not delete the student: {e}")
+
 
     def show_classes_and_students(self):
         self.clear_content_frame()
