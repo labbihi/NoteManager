@@ -32,10 +32,15 @@ class BaseModel:
     def get_by_id(cls, record_id):
         return session.query(cls).filter_by(id=record_id).first()
 
+    @classmethod
+    def get_by_name(cls, record_name):
+        return session.query(cls).filter_by(name=record_name).first()
+
 # Entity: Student
 class Student(Base, BaseModel):
     __tablename__ = 'students'
     id = Column(Integer, primary_key=True)
+    code = Column(String(50), nullable=False)
     name = Column(String(255), nullable=False)
     birthdate = Column(Date)
     email = Column(String(255))
@@ -43,6 +48,10 @@ class Student(Base, BaseModel):
     mclass_id = Column(Integer, ForeignKey('mclasses.id'))
     mclass = relationship('MClass', back_populates='students')
     notes = relationship('NoteGoupe', back_populates='student')
+
+
+    def __repr__(self):
+        return f"Student(ID: {self.id}, code: {self.code}, Name: {self.name}, Email: {self.email}, birthdate: {self.birthdate})"
 
 # Entity: MClass
 class MClass(Base, BaseModel):
